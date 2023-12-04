@@ -1,0 +1,69 @@
+--Question 1
+--Write the SQL code (query) to create a view based on the Guide Table.
+--The view should select the guide’s full name, phone number and hire date.
+--Order the view according to last name
+
+Create View Guide_View
+as
+select last_name, first_name, phone_num, hire_date
+from guide
+go
+
+--Question 2
+--Write a SQL query to display the results of your view created in question 1
+
+select *
+from guide_view
+order by last_name
+go
+
+--Question 3
+--Select the Customer number, phone number and the reservation id and trip date for all the trips that have a trip price over 50.00
+create view customer_reservation_view
+
+Select c.customer_num, c.phone, r.reservation_id, r.trip_date
+from c customer inner join r reservation
+on c.customer_num = r.customer_num
+where r.trip_price > 50.00
+go
+
+--Question 4
+--Write a SQL query to display the results of your view as created in question 3
+
+select *
+from customer_reservation_view
+
+#Exercise 4 
+
+
+--Question 1
+--Create a partition function to sort the data based on a datetime value.
+--Use the Trip Price (20,50 and 100) from the Reservation table to determine the partitions for the data to be placed in.
+
+Create Partition Function [p_ReservationsByPrice](int)
+AS RANGE RIGHT FOR VALUES ('20', '50','100')
+
+
+--Question 2
+--The ColonialDB only has 1 file group.
+--Map the data from your partition function ALL to the one file group.
+--To do this create a partition scheme to map the prices from the partition function to the file group in the database
+
+CREATE PARTITION SCHEME ps_ReservationsByPrice
+AS PARTITION p_ReservationsByPrice
+ALL TO ('PRIMARY');
+go
+
+--Question 3
+--Write a query to view how the partitioning splits the records across the files and filegroups
+
+SELECT OBJECT_SCHEMA_NAME (t. object_id) AS schema_name
+,t. name AS table_name
+,i. index_id
+,i. name AS index_name
+,p. partition_number
+,p. rows
+FROM sys .tables t
+join sys .indexes i ON t. object_id = i. object_id
+join sys .partitions p ON i. object_id=p .object_id AND i.index_id =p. index_id
+
