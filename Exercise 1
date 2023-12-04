@@ -1,0 +1,108 @@
+
+CREATE DATABASE AdventureTrips
+GO
+
+USE AdventureTrips
+GO
+
+CREATE TABLE GUIDE
+(GUIDE_NUM CHAR(4) PRIMARY KEY,
+FIRST_NAME CHAR(15))
+INSERT INTO GUIDE
+VALUES ('AM01','Miles'),('RH01','Boyers')
+
+CREATE TABLE TRIP
+(TRIP_ID DECIMAL(3,0) PRIMARY KEY,
+TRIP_NAME CHAR(75),
+LOCATION CHAR(50));
+INSERT INTO TRIP
+VALUES
+(1,'Mt Ascutney - North Peak','Weathersfield'),(2,'Seal Beach Harbor','Bar Harbor')
+
+CREATE TABLE CUSTOMER
+(CUSTOMER_NUM INT PRIMARY KEY,
+LAST_NAME CHAR(30) NOT NULL,
+FIRST_NAME CHAR (30),
+ADDRESS CHAR(35),
+CITY CHAR(35),
+POSTAL_CODE CHAR(5),
+PHONE CHAR(12) );
+INSERT INTO CUSTOMER
+VALUES ('1','Unser','Glory','342 Pineview St.','Danbury','06810','203-555-8534')
+
+CREATE TABLE RESERVATION
+(RESERVATION_ID CHAR(7) PRIMARY KEY,
+TRIP_ID DECIMAL(3,0) references TRIP(TRIP_ID),
+TRIP_DATETIME DATETIME,
+TRIP_PRICE DECIMAL(6,2),
+CUSTOMER_NUM INT references CUSTOMER(CUSTOMER_NUM));
+INSERT INTO RESERVATION
+VALUES
+('1600001',1,'2016-03-26',55.00,1);
+
+CREATE TABLE TRIP_GUIDES
+(TRIP_ID DECIMAL(3,0) references TRIP(TRIP_ID),
+GUIDE_NUM CHAR(4) references GUIDE(GUIDE_NUM),
+PRIMARY KEY (TRIP_ID, GUIDE_NUM) );
+
+INSERT INTO TRIP_GUIDES
+VALUES
+(1,'RH01'),(2,'AM01')
+GO
+
+select C.CUSTOMER_NUM,C.FIRST_NAME,C.LAST_NAME,R.RESERVATION_ID,T.TRIP_ID,T.TRIP_NAME,R.TRIP_DATETIME,G.GUIDE_NUM,G.FIRST_NAME
+FROM CUSTOMER c INNER JOIN RESERVATION r
+ON c.CUSTOMER_NUM = r.CUSTOMER_NUM
+INNER JOIN TRIP t
+ON r.TRIP_ID = t.TRIP_ID
+INNER JOIN TRIP_GUIDES tg
+on t.TRIP_ID = tg.TRIP_ID
+INNER JOIN GUIDE g
+on tg.GUIDE_NUM = g.GUIDE_NUM
+
+--Question 4
+
+--Write a stored procedure with parameters to encapsulate a transaction to add a new customer with a reserved trip
+
+CREATE PROCEDURE spAddCustomer
+@CustID int,
+@CustName CHAR (30),
+@CustLastName CHAR (30),
+@Reservation CHAR(7),
+@TripID DECIMAL(3,0),
+@TRIP_DATETIME DATETIME,
+@TRIP_PRICE DECIMAL(6,2),
+@ADDRESS CHAR(35),
+@CITY CHAR(35),
+@POSTAL_CODE CHAR(5),
+@PHONE CHAR(12)
+
+AS
+BEGIN TRY
+BEGIN TRANSACTION
+INSERT INTO CUSTOMER VALUES (@CustID, @CustName, @CustLastName, @ADDRESS, @CITY, @POSTAL_CODE,@PHONE)
+INSERT INTO RESERVATION VALUES ( @Reservation,@TripID, @TRIP_DATETIME, @TRIP_PRICE,@CustID)
+COMMIT
+PRINT 'Customer Added'
+END TRY
+
+BEGIN CATCH
+ROLLBACK TRANSACTION
+PRINT 'Transaction Rolled Back'
+END CATCH
+
+--Execute the stored procedure you created in the previous question with parameters. Paste your code in the white space provided.
+--Note: you can run your SQL query created as part of question 3 to view and check your results
+
+EXEC spAddCustomer
+@CustID = 2,
+@CustName ='Vaccari',
+@CustLastName = 'Adam',
+@Reservation = '1600002',
+@TripID = 2,
+@TRIP_DATETIME = '2016-05-14',
+@TRIP_PRICE = 35.00,
+@ADDRESS = '1282 Ocean Walk',
+@CITY = 'Ocean CITY',
+@POSTAL_CODE = '08226',
+@PHONE = '609-555-5231'
