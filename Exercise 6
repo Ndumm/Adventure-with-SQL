@@ -1,0 +1,26 @@
+--using colonialDB
+--Creating views 
+--Views work similarly like stored procedure, they contain codes that can be called and executed like a function.
+--Views only contain SELECT statements 
+
+--Question 1
+CREATE VIEW guideOrderby AS												                    --'guideTableView' is the name of the view 
+SELECT TOP 100 PERCENT LAST_NAME, FIRST_NAME, PHONE_NUM, HIRE_DATE		-- you cant use an ORDER BY in a view, to use it you must include 'TOP 100 PERCENT' at the start of your select statement
+FROM GUIDE																			
+ORDER BY LAST_NAME
+GO
+
+--Question 2
+SELECT * FROM guideOrderby												--to call the View you just select use a normal select statement 
+
+--Question 3
+CREATE VIEW customerReservationView AS
+SELECT c.CUSTOMER_NUM, c.PHONE, p.RESERVATION_ID, p.TRIP_DATE
+FROM CUSTOMER c
+INNER JOIN RESERVATION p
+ON c.CUSTOMER_NUM = p.CUSTOMER_NUM
+WHERE TRIP_PRICE > 50.00
+GO
+
+--Question 4 
+SELECT * FROM customerReservationView
