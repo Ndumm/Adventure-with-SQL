@@ -1,0 +1,63 @@
+
+--Question 1
+--You are instructed to write a SQL query to display the customer's full name.
+
+SELECT FIRST_NAME,LAST_NAME
+FROM Customer
+
+--Question 2
+--You are instructed to write a SQL query to select all the guides who are from New Hampshire (State: NH).
+
+SELECT GUIDE_NUM,FIRST_NAME,LAST_NAME
+FROM GUIDE
+WHERE STATE = 'NA'
+
+--Question 3
+--You are instructed to write a SQL query to display the names of trips with a trip type that is Hiking and season that is Summer
+
+SELECT TRIP_NAME 
+FROM TRIP
+WHERE TYPE='Hiking' AND SEASON='Summer'
+
+--Question 4
+--You are instructed to write a SQL query to display the reservation numbers for all reservations that are after 10-1-2016.
+
+select RESERVATION_ID
+FROM RESERVATION
+WHERE TRIP_DATE > '10-1-2016'
+
+--Question 5
+--You are instructed to write a SQL query to display all customer names, surnames and reservation numbers.
+
+SELECT FIRST_NAME, LAST_NAME, RESERVATION_ID
+FROM CUSTOMER INNER JOIN RESERVATION 
+ON CUSTOMER.CUSTOMER_NUM = RESERVATION.CUSTOMER_NUM
+
+--Question 6
+--You are instructed to write a SQL query to display the telephone numbers of all guides that start with 603
+
+SELECT PHONE_NUM
+FROM GUIDE
+WHERE PHONE_NUM like '603%'
+
+--Question 7
+--You are instructed to write a SQL query to display the average trip price of hiking trips.
+
+SELECT TRIP.TRIP_NAME, AVG(RESERVATION.TRIP_PRICE) AS [Average Hiking Trip Price]
+FROM TRIP INNER JOIN RESERVATION
+ON TRIP.TRIP_ID = RESERVATION.TRIP_ID
+WHERE TRIP.TYPE like '%hiking%' 
+GROUP BY TRIP.TRIP_NAME
+ORDER BY [Average Hiking Trip Price]
+
+--Question 8
+--Create indexes for any 2 of the tables in your Colonial database
+CREATE INDEX index_name
+ON table_name (column1, column2, ...);
+
+CREATE INDEX Index_Whole_Reservation
+ON Reservation (RESERVATION_ID, TRIP_ID, TRIP_DATE, NUM_PERSONS, TRIP_PRICE, OTHER_FEES, CUSTOMER_NUM)
+GO
+CREATE INDEX Index_Whole_Trip
+ON TRIP (TRIP_ID, TRIP_NAME, START_LOCATION, STATE, DISTANCE, MAX_GRP_SIZE, TYPE, SEASON)
+GO
